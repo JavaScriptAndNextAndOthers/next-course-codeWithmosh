@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import schema from "../schema";
 import { prisma } from "@/prisma/client";
 
+// GET /api/users
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -19,6 +20,8 @@ export async function GET(
   return NextResponse.json(user);
 }
 
+
+// PUT /api/users/[id]
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -51,23 +54,29 @@ export async function PUT(
   return NextResponse.json(updatedUser);
 }
 
+
+// DELETE /api/users/[id]
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  // Check if the user exists
   const user = await prisma.user.findUnique({
-    where: { id: params.id }
-  })
-  
+    where: { id: parseInt(params.id) },
+  });
+
   if (!user)
     return NextResponse.json(
       { error: "User not found" },
       { status: 404 }
     );
 
-  await prisma.user.delete({ 
-    where: { id: user.id }
+  // Delete the user
+  await prisma.user.delete({
+    where: { id: parseInt(params.id) },
   });
 
-  return NextResponse.json({});
+  return NextResponse.json({ success: true });
 }
+
+
